@@ -2,6 +2,7 @@ namespace InternetProvider.Domain.Entities.Output;
 
 public class InternetConnectionRequestOutput
 {
+    public int Id { get; set; }
     public string ClientPhoneNumber { get; set; } = null!;
     public string ClientEmail { get; set; } = null!;
     public string InternetTariffName { get; set; } = null!;

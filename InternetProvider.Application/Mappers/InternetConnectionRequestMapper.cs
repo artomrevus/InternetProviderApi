@@ -11,6 +11,7 @@ public static class InternetConnectionRequestMapper
     {
         return new InternetConnectionRequestResponseDto()
         {
+            Id = oth.Id,
             ClientPhoneNumber = oth.ClientPhoneNumber,
             ClientEmail = oth.ClientEmail,
             InternetTariffName = oth.InternetTariffName,

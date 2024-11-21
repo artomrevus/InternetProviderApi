@@ -10,6 +10,7 @@ public static class InternetConnectionRequestMapper
     {
         return new InternetConnectionRequestOutput()
         {
+            Id = oth.InternetConnectionRequestId,
             ClientPhoneNumber = oth.Client.PhoneNumber,
             ClientEmail = oth.Client.Email,
             InternetTariffName = oth.InternetTariff.Name,

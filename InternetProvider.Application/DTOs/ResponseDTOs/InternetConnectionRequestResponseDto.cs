@@ -2,6 +2,7 @@ namespace InternetProvider.Application.DTOs.ResponseDTOs;
 
 public class InternetConnectionRequestResponseDto
 {
+    public int Id { get; set; }
     public string ClientPhoneNumber { get; set; } = null!;
     public string ClientEmail { get; set; } = null!;
     public string InternetTariffName { get; set; } = null!;
