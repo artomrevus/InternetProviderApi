@@ -1,4 +1,5 @@
-using InternetProvider.Domain.Entities;
+using InternetProvider.Domain.Entities.Input;
+using InternetProvider.Domain.Entities.Output;
 using InternetProvider.Domain.Mappers;
 using InternetProvider.Domain.Interfaces.Services;
 using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
@@ -21,8 +22,10 @@ public class ClientStatusService(IUnitOfWork unitOfWork) : IClientStatusService
 
     public async Task AddAsync(ClientStatusInput entity)
     {
-        var entities = (await unitOfWork.ClientStatuses.GetAllAsync()).ToList();
-        var lastEntityId = entities.Any() ? entities.Last().ClientStatusId : 0;
+        var entities = await unitOfWork.ClientStatuses.GetAllAsync();
+        var entitiesList = entities.ToList();
+        
+        var lastEntityId = entitiesList.Count != 0 ? entitiesList.Last().ClientStatusId : 0;
         
         var repositoryEntity = entity.ToInfrastructureClientStatus();
         repositoryEntity.ClientStatusId = lastEntityId + 1;

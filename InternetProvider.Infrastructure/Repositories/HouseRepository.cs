@@ -23,12 +23,11 @@ public class HouseRepository(InternetProviderContext context) : IHouseRepository
         return house;
     }
 
-    public async Task<IEnumerable<House>> GetAllAsync()
+    public Task<IEnumerable<House>> GetAllAsync()
     {
-        return await context.Houses
+        return Task.FromResult<IEnumerable<House>>(context.Houses
             .Include(x => x.Street)
-            .ThenInclude(x => x.City)
-            .ToListAsync();
+            .ThenInclude(x => x.City));
     }
 
     public async Task AddAsync(House entity)

@@ -6,7 +6,7 @@ public interface IGetService<TResponseDto>
 {
     public Task<IEnumerable<TResponseDto>> GetAsync(
         Dictionary<string, object>? filter,
-        Dictionary<string, SortType>? sortFields,
+        Dictionary<string, SortType>? sort,
         int? pageNumber,
         int? pageSize);
     

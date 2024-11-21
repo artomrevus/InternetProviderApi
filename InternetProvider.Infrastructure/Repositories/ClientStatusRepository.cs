@@ -2,7 +2,6 @@ using InternetProvider.Infrastructure.Data;
 using InternetProvider.Infrastructure.Exceptions;
 using InternetProvider.Infrastructure.Interfaces.Repositories;
 using InternetProvider.Infrastructure.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace InternetProvider.Infrastructure.Repositories;
 
@@ -19,9 +18,9 @@ public class ClientStatusRepository(InternetProviderContext context) : IClientSt
         return clientStatus;
     }
 
-    public async Task<IEnumerable<ClientStatus>> GetAllAsync()
+    public Task<IEnumerable<ClientStatus>> GetAllAsync()
     {
-        return await context.ClientStatuses.ToListAsync();
+        return Task.FromResult<IEnumerable<ClientStatus>>(context.ClientStatuses);
     }
 
     public async Task AddAsync(ClientStatus entity)

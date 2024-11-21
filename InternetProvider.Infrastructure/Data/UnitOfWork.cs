@@ -15,6 +15,10 @@ public class UnitOfWork(InternetProviderContext context) : IUnitOfWork, IDisposa
     public ILocationTypeRepository LocationTypes { get; } = new LocationTypeRepository(context);
     public IStreetRepository Streets { get; } = new StreetRepository(context);
     public IClientStatusRepository ClientStatuses { get; } = new ClientStatusRepository(context);
+    public IInternetTariffStatusRepository InternetTariffStatuses { get; } = new InternetTariffStatusRepository(context);
+    public IInternetConnectionRequestStatusRepository InternetConnectionRequestStatuses { get; } = new InternetConnectionRequestStatusRepository(context);
+    public IInternetTariffRepository InternetTariffs { get; } = new InternetTariffRepository(context);
+    public IInternetConnectionRequestRepository InternetConnectionRequests { get; } = new InternetConnectionRequestRepository(context);
 
     public async Task CompleteAsync()
     {

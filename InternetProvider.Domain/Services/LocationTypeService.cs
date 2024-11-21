@@ -1,4 +1,5 @@
-using InternetProvider.Domain.Entities;
+using InternetProvider.Domain.Entities.Input;
+using InternetProvider.Domain.Entities.Output;
 using InternetProvider.Domain.Mappers;
 using InternetProvider.Domain.Interfaces.Services;
 using InternetProvider.Infrastructure.Interfaces.UnitOfWork;

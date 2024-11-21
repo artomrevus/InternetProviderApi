@@ -210,5 +210,4 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         
         return clients.Skip((pageNumber - 1) * pageSize).Take(pageSize);
     }
-    
 }

@@ -38,6 +38,40 @@ public static class ConvertRepositoryExtensions
         throw new RepositoryException($"Cannot convert {value} to int. Value must be convertible to int or JsonElement.");
     }
     
+    public static decimal ToDecimal(this object value)
+    {
+        if (value is null)
+        {
+            throw new RepositoryException("Cannot convert null to decimal.");
+        }
+
+        if (value is System.Text.Json.JsonElement jsonElement)
+        {
+            try
+            {
+                return jsonElement.GetDecimal();
+            }
+            catch (Exception)
+            {
+                throw new RepositoryException($"Cannot convert {jsonElement} to decimal");
+            }
+        }
+        
+        if (value is IConvertible)
+        {
+            try
+            {
+                return Convert.ToDecimal(value);
+            }
+            catch (Exception)
+            {
+                throw new RepositoryException($"Failed to convert {value} to decimal.");
+            }
+        }
+
+        throw new RepositoryException($"Cannot convert {value} to decimal. Value must be convertible to decimal or JsonElement.");
+    }
+    
     public static DateOnly ToDateOnly(this object value)
     {
         if (value is null)

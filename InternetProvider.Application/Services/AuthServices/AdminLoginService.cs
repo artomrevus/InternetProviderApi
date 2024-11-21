@@ -38,7 +38,7 @@ public class AdminLoginService(UserManager<IdentityUser> userManager, ITokenServ
     private async Task<IList<string>> GetUserRolesAsync(IdentityUser identityUser)
     {
         var userRoles = await userManager.GetRolesAsync(identityUser);
-        if (userRoles.IsNullOrEmpty())
+        if (userRoles is null || !userRoles.Any())
         {
             throw new AccessException($"No role assigned to user with username \"{identityUser.UserName}\".");
         }

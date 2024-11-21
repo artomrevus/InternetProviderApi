@@ -40,6 +40,10 @@ public static class BuilderExtensions
         builder.Services.AddScoped<Domain.Interfaces.Services.ILocationService, Domain.Services.LocationService>();
         builder.Services.AddScoped<Domain.Interfaces.Services.ILocationTypeService, Domain.Services.LocationTypeService>();
         builder.Services.AddScoped<Domain.Interfaces.Services.IStreetService, Domain.Services.StreetService>();
+        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetTariffStatusService, Domain.Services.InternetTariffStatusService>();
+        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetConnectionRequestStatusService, Domain.Services.InternetConnectionRequestStatusService>();
+        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetTariffService, Domain.Services.InternetTariffService>();
+        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetConnectionRequestService, Domain.Services.InternetConnectionRequestService>();
     }
     
     public static void AddApplicationCrudServices(this WebApplicationBuilder builder)
@@ -51,6 +55,10 @@ public static class BuilderExtensions
         builder.Services.AddScoped<ILocationService, LocationService>();
         builder.Services.AddScoped<ILocationTypeService, LocationTypeService>();
         builder.Services.AddScoped<IStreetService, StreetService>();
+        builder.Services.AddScoped<IInternetTariffStatusService, InternetTariffStatusService>();
+        builder.Services.AddScoped<IInternetConnectionRequestStatusService, InternetConnectionRequestStatusService>();
+        builder.Services.AddScoped<IInternetTariffService, InternetTariffService>();
+        builder.Services.AddScoped<IInternetConnectionRequestService, InternetConnectionRequestService>();
     }
     
     public static void AddApplicationAuthServices(this WebApplicationBuilder builder)
