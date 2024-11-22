@@ -1,0 +1,11 @@
+# Build Folders 
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# JetBrains Rider's auto generated files
+.idea/
