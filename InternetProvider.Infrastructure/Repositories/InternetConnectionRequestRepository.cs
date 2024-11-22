@@ -130,6 +130,7 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
                 "number" => internetConnectionRequests.Where(x => x.Number.ToLower().Contains(filter.Value.ToStr().ToLower())),
                 "requestdatemin" => internetConnectionRequests.Where(x => x.RequestDate >= filter.Value.ToDateOnly()),
                 "requestdatemax" => internetConnectionRequests.Where(x => x.RequestDate <= filter.Value.ToDateOnly()),
+                "clientid" => internetConnectionRequests.Where(x => x.Client.ClientId == filter.Value.ToInt()),
                 _ => throw new RepositoryException($"Filter {filter.Key} is not supported.")
             };
         }

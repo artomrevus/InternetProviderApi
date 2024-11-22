@@ -14,7 +14,6 @@ namespace InternetProvider.API.Controllers;
 public class LocationController(ILocationService appService) : ControllerBase
 {
     [HttpGet("{id:int:min(1)}")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         try
@@ -33,7 +32,6 @@ public class LocationController(ILocationService appService) : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Get(
         [FromQuery] string? filter = null,
         [FromQuery] string? sort = null,
@@ -66,7 +64,6 @@ public class LocationController(ILocationService appService) : ControllerBase
 
     [HttpGet]
     [Route("Count")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Count([FromQuery] string? filter = null)
     {
         try

@@ -3,7 +3,9 @@ namespace InternetProvider.Application.DTOs.ResponseDTOs;
 public class ClientResponseDto
 {
     public int Id { get; set; }
+    public int ClientStatusId { get; set; }
     public string? ClientStatusName { get; set; }
+    public int LocationId { get; set; }
     public string? LocationTypeName { get; set; }
     public string? CityName { get; set; }
     public string? StreetName { get; set; }

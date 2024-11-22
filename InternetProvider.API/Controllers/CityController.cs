@@ -11,7 +11,6 @@ namespace InternetProvider.API.Controllers;
 public class CityController(ICityService appService) : ControllerBase
 {
     [HttpGet("{id:int:min(1)}")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         try
@@ -30,7 +29,6 @@ public class CityController(ICityService appService) : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll()
     {
         try

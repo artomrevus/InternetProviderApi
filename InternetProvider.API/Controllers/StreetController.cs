@@ -30,7 +30,6 @@ public class StreetController(IStreetService appService) : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll()
     {
         try

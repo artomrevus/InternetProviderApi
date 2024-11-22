@@ -11,12 +11,4 @@ public class RepositoryException : Exception
         : base(message)
     {
     }
-    
-    public static void ThrowIfNull(object? obj, string message)
-    {
-        if (obj is null)
-        {
-            throw new RepositoryException(message);
-        }
-    }
 }

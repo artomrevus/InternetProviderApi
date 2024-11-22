@@ -13,7 +13,9 @@ public static class ClientMapper
         return new ClientResponseDto()
         {
             Id = oth.Id,
+            ClientStatusId = oth.ClientStatusId,
             ClientStatusName = oth.ClientStatusName,
+            LocationId = oth.LocationId,
             LocationTypeName = oth.LocationTypeName,
             CityName = oth.CityName,
             StreetName = oth.StreetName,

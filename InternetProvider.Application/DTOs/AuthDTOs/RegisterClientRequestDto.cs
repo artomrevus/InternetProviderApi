@@ -4,9 +4,10 @@ namespace InternetProvider.Application.DTOs.AuthDTOs;
 
 public class RegisterClientRequestDto
 {
+    [Required]
     public string UserName { get; set; } = default!;
+    [Required]
     public string Password { get; set; } = default!;
-    
     [Required]
     public int ClientStatusId { get; set; }
     [Required]

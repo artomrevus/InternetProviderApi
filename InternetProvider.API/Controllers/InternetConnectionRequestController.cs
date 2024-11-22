@@ -33,7 +33,7 @@ public class InternetConnectionRequestController(IInternetConnectionRequestServi
     }
     
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Client")]
     public async Task<IActionResult> Get(
         [FromQuery] string? filter = null,
         [FromQuery] string? sort = null,
@@ -81,7 +81,6 @@ public class InternetConnectionRequestController(IInternetConnectionRequestServi
     }
     
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Add([FromBody] InternetConnectionRequestRequestDto dto)
     {
         try

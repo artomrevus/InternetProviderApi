@@ -11,7 +11,9 @@ public static class ClientMapper
         return new ClientOutput()
         {
             Id = oth.ClientId,
+            ClientStatusId = oth.ClientStatusId,
             ClientStatusName = oth.ClientStatus.ClientStatusName,
+            LocationId = oth.LocationId,
             LocationTypeName = oth.Location.LocationType.LocationTypeName,
             CityName = oth.Location.House.Street.City.CityName,
             StreetName = oth.Location.House.Street.StreetName,

@@ -11,7 +11,7 @@ namespace InternetProvider.API.Controllers;
 public class InternetTariffController(IInternetTariffService appService) : ControllerBase
 {
     [HttpGet("{id:int:min(1)}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Client")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         try
@@ -30,7 +30,7 @@ public class InternetTariffController(IInternetTariffService appService) : Contr
     }
     
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Client")]
     public async Task<IActionResult> GetAll()
     {
         try
