@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class InternetTariff
+namespace InternetProvider.Infrastructure.Models;
+
+public class InternetTariff : IInternetTariff
 {
     public int InternetTariffId { get; set; }
 
@@ -25,4 +27,22 @@ public class InternetTariff
     public virtual InternetTariffStatus InternetTariffStatus { get; set; } = null!;
 
     public virtual LocationType LocationType { get; set; } = null!;
+    
+    ICollection<IInternetConnectionRequest> IInternetTariff.InternetConnectionRequests
+    {
+        get => InternetConnectionRequests.Cast<IInternetConnectionRequest>().ToList();
+        set => InternetConnectionRequests = value.Cast<InternetConnectionRequest>().ToList();
+    }
+
+    IInternetTariffStatus IInternetTariff.InternetTariffStatus
+    {
+        get => InternetTariffStatus;
+        set => InternetTariffStatus = (InternetTariffStatus)value;
+    }
+    
+    ILocationType IInternetTariff.LocationType
+    {
+        get => LocationType;
+        set => LocationType = (LocationType)value;
+    }
 }

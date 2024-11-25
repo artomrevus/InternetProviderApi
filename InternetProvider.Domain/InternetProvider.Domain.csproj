@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\InternetProvider.Infrastructure\InternetProvider.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Remove="ServicesInterfaces\**" />
     </ItemGroup>
 
@@ -20,6 +16,14 @@
 
     <ItemGroup>
       <None Remove="ServicesInterfaces\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\InternetProvider.Abstraction\InternetProvider.Abstraction.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
     </ItemGroup>
 
 </Project>

@@ -1,41 +1,35 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.GeneralTypes.Sort;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.Abstraction.Sort;
 
 namespace InternetProvider.Domain.Services;
 
 public class LocationService(IUnitOfWork unitOfWork) : ILocationService
 {
-    public async Task<LocationOutput> GetByIdAsync(int id)
+    public async Task<ILocation> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.Locations.GetByIdAsync(id);
-        return repositoryEntity.ToDomainLocationOutput();
+        return await unitOfWork.Locations.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<LocationOutput>> GetAllAsync()
+    public async Task<IEnumerable<ILocation>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.Locations.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainLocationOutput());
+        return await unitOfWork.Locations.GetAllAsync();
     }
 
-    public async Task AddAsync(LocationInput entity)
+    public async Task AddAsync(ILocation entity)
     {
-        var repositoryEntity = entity.ToInfrastructureLocation();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Locations.AddAsync(repositoryEntity);
+        await unitOfWork.Locations.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, LocationInput entity)
+    public async Task UpdateAsync(int id, ILocation entity)
     {
-        var repositoryEntity = entity.ToInfrastructureLocation();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Locations.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.Locations.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 
@@ -45,14 +39,13 @@ public class LocationService(IUnitOfWork unitOfWork) : ILocationService
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task<IEnumerable<LocationOutput>> GetAsync(
+    public async Task<IEnumerable<ILocation>> GetAsync(
         Dictionary<string, object>? filter,
         Dictionary<string, SortType>? sort, 
         int? pageNumber,
         int? pageSize)
     {
-        var repositoryEntities = await unitOfWork.Locations.GetAsync(filter, sort, pageNumber, pageSize);
-        return repositoryEntities.Select(x => x.ToDomainLocationOutput());
+        return await unitOfWork.Locations.GetAsync(filter, sort, pageNumber, pageSize);
     }
     
     public async Task<int> CountAsync(Dictionary<string, object>? filter)

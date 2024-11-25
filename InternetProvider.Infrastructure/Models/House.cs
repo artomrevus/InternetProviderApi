@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class House
+namespace InternetProvider.Infrastructure.Models;
+
+public class House : IHouse
 {
     public int HouseId { get; set; }
 
@@ -15,4 +17,17 @@ public class House
     public virtual ICollection<Location> Locations { get; set; } = new List<Location>();
 
     public virtual Street Street { get; set; } = null!;
+    
+    
+    ICollection<ILocation> IHouse.Locations
+    {
+        get => Locations.Cast<ILocation>().ToList();
+        set => Locations = value.Cast<Location>().ToList();
+    }
+
+    IStreet IHouse.Street
+    {
+        get => Street;
+        set => Street = (Street)value;
+    }
 }

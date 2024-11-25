@@ -1,6 +1,6 @@
-using InternetProvider.Application.DTOs.AuthDTOs;
-using InternetProvider.Application.Exception;
-using InternetProvider.Application.Interfaces.Services;
+using InternetProvider.Abstraction.Exceptions;
+using InternetProvider.API.Auth.Interfaces;
+using InternetProvider.API.DTOs.AuthDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InternetProvider.API.Controllers;

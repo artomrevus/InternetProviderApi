@@ -1,13 +1,14 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 
 namespace InternetProvider.Infrastructure.Repositories;
 
 public class InternetTariffStatusRepository(InternetProviderContext context) : IInternetTariffStatusRepository
 {
-    public async Task<InternetTariffStatus> GetByIdAsync(int id)
+    public async Task<IInternetTariffStatus> GetByIdAsync(int id)
     {
         var internetTariffStatus = await context.InternetTariffStatuses.FindAsync(id);
         if (internetTariffStatus is null)
@@ -18,17 +19,24 @@ public class InternetTariffStatusRepository(InternetProviderContext context) : I
         return internetTariffStatus;
     }
 
-    public Task<IEnumerable<InternetTariffStatus>> GetAllAsync()
+    public Task<IEnumerable<IInternetTariffStatus>> GetAllAsync()
     {
-        return Task.FromResult<IEnumerable<InternetTariffStatus>>(context.InternetTariffStatuses);
+        return Task.FromResult<IEnumerable<IInternetTariffStatus>>(context.InternetTariffStatuses);
     }
 
-    public async Task AddAsync(InternetTariffStatus entity)
+    public async Task AddAsync(IInternetTariffStatus entity)
     {
-        await context.InternetTariffStatuses.AddAsync(entity);
+        if (entity is InternetTariffStatus internetTariffStatusEntity)
+        {
+            await context.InternetTariffStatuses.AddAsync(internetTariffStatusEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type InternetTariffStatus.");
+        }
     }
 
-    public async Task UpdateAsync(int id, InternetTariffStatus entity)
+    public async Task UpdateAsync(int id, IInternetTariffStatus entity)
     {
         var internetTariffStatus = await context.InternetTariffStatuses.FindAsync(id);
         if (internetTariffStatus is null)

@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
-using InternetProvider.GeneralTypes.Sort;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Sort;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using InternetProvider.Infrastructure.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class InternetConnectionRequestRepository(InternetProviderContext context) : IInternetConnectionRequestRepository
 {
-    public async Task<InternetConnectionRequest> GetByIdAsync(int id)
+    public async Task<IInternetConnectionRequest> GetByIdAsync(int id)
     {
         var internetConnectionRequest = await context.InternetConnectionRequests
             .Include(x => x.Client)
@@ -27,20 +28,27 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
         return internetConnectionRequest;
     }
 
-    public Task<IEnumerable<InternetConnectionRequest>> GetAllAsync()
+    public Task<IEnumerable<IInternetConnectionRequest>> GetAllAsync()
     {
-        return Task.FromResult<IEnumerable<InternetConnectionRequest>>(context.InternetConnectionRequests
+        return Task.FromResult<IEnumerable<IInternetConnectionRequest>>(context.InternetConnectionRequests
             .Include(x => x.Client)
             .Include(x => x.InternetTariff)
             .Include(x => x.InternetConnectionRequestStatus));
     }
 
-    public async Task AddAsync(InternetConnectionRequest entity)
+    public async Task AddAsync(IInternetConnectionRequest entity)
     {
-        await context.InternetConnectionRequests.AddAsync(entity);
+        if (entity is InternetConnectionRequest internetConnectionRequestEntity)
+        {
+            await context.InternetConnectionRequests.AddAsync(internetConnectionRequestEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type InternetConnectionRequest.");
+        }
     }
 
-    public async Task UpdateAsync(int id, InternetConnectionRequest entity)
+    public async Task UpdateAsync(int id, IInternetConnectionRequest entity)
     {
         var internetConnectionRequest = await context.InternetConnectionRequests.FindAsync(id);
         if (internetConnectionRequest is null)
@@ -67,13 +75,13 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
         context.InternetConnectionRequests.Remove(internetConnectionRequest);
     }
 
-    public Task<IEnumerable<InternetConnectionRequest>> GetAsync(
+    public Task<IEnumerable<IInternetConnectionRequest>> GetAsync(
         Dictionary<string, object>? filter, 
         Dictionary<string, SortType>? sort, 
         int? pageNumber, 
         int? pageSize)
     {
-        IQueryable<InternetConnectionRequest> internetConnectionRequests = context.InternetConnectionRequests
+        IQueryable<IInternetConnectionRequest> internetConnectionRequests = context.InternetConnectionRequests
             .Include(x => x.Client)
             .Include(x => x.InternetTariff)
             .Include(x => x.InternetConnectionRequestStatus);
@@ -98,7 +106,7 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
 
     public async Task<int> CountAsync(Dictionary<string, object>? filter)
     {
-        IQueryable<InternetConnectionRequest> internetConnectionRequests = context.InternetConnectionRequests
+        IQueryable<IInternetConnectionRequest> internetConnectionRequests = context.InternetConnectionRequests
             .Include(x => x.Client)
             .Include(x => x.InternetTariff)
             .Include(x => x.InternetConnectionRequestStatus);
@@ -111,7 +119,7 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
         return await internetConnectionRequests.CountAsync();
     }
     
-    private IQueryable<InternetConnectionRequest> ApplyFilter(IQueryable<InternetConnectionRequest> internetConnectionRequests, Dictionary<string, object> filters)
+    private IQueryable<IInternetConnectionRequest> ApplyFilter(IQueryable<IInternetConnectionRequest> internetConnectionRequests, Dictionary<string, object> filters)
     {
         foreach (var filter in filters)
         {
@@ -138,15 +146,15 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
         return internetConnectionRequests;
     }
     
-    private IQueryable<InternetConnectionRequest> ApplySort(IQueryable<InternetConnectionRequest> internetConnectionRequests, Dictionary<string, SortType> sorts)
+    private IQueryable<IInternetConnectionRequest> ApplySort(IQueryable<IInternetConnectionRequest> internetConnectionRequests, Dictionary<string, SortType> sorts)
     {
-        IOrderedQueryable<InternetConnectionRequest>? orderedInternetConnectionRequests = null;
+        IOrderedQueryable<IInternetConnectionRequest>? orderedInternetConnectionRequests = null;
 
         foreach (var sort in sorts)
         {
             var sortFieldLower = sort.Key.ToLowerInvariant();
             
-            Expression<Func<InternetConnectionRequest, object>> keySelector = sortFieldLower switch
+            Expression<Func<IInternetConnectionRequest, object>> keySelector = sortFieldLower switch
             {
                 "clientphonenumber" => x => x.Client.PhoneNumber,
                 "clientemail" => x => x.Client.Email,
@@ -167,7 +175,7 @@ public class InternetConnectionRequestRepository(InternetProviderContext context
         return orderedInternetConnectionRequests ?? internetConnectionRequests;
     }
 
-    private IQueryable<InternetConnectionRequest> ApplyPagination(IQueryable<InternetConnectionRequest> internetConnectionRequests, int pageNumber, int pageSize)
+    private IQueryable<IInternetConnectionRequest> ApplyPagination(IQueryable<IInternetConnectionRequest> internetConnectionRequests, int pageNumber, int pageSize)
     {
         if (pageNumber < 1 || pageSize < 1)
         {

@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class InternetConnectionRequest
+namespace InternetProvider.Infrastructure.Models;
+
+public class InternetConnectionRequest : IInternetConnectionRequest
 {
     public int InternetConnectionRequestId { get; set; }
 
@@ -25,4 +27,23 @@ public class InternetConnectionRequest
     public virtual InternetConnectionRequestStatus InternetConnectionRequestStatus { get; set; } = null!;
 
     public virtual InternetTariff InternetTariff { get; set; } = null!;
+    
+    
+    IClient IInternetConnectionRequest.Client
+    {
+        get => Client;
+        set => Client = (Client)value;
+    }
+    
+    IInternetConnectionRequestStatus IInternetConnectionRequest.InternetConnectionRequestStatus
+    {
+        get => InternetConnectionRequestStatus;
+        set => InternetConnectionRequestStatus = (InternetConnectionRequestStatus)value;
+    }
+
+    IInternetTariff IInternetConnectionRequest.InternetTariff
+    {
+        get => InternetTariff;
+        set => InternetTariff = (InternetTariff)value;
+    }
 }

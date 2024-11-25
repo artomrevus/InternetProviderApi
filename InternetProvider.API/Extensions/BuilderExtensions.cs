@@ -1,9 +1,17 @@
 using System.Text;
-using InternetProvider.Application.Interfaces.Services;
-using InternetProvider.Application.Services.AuthServices;
-using InternetProvider.Application.Services.CrudServices;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.API.Auth.Auth;
+using InternetProvider.API.Auth.Interfaces;
+using InternetProvider.API.DTOs.AuthDTOs;
+using InternetProvider.API.DTOs.RequestDTOs;
+using InternetProvider.API.DTOs.ResponseDTOs;
+using InternetProvider.API.Mappers.Interfaces;
+using InternetProvider.API.Mappers.Mappers;
+using InternetProvider.Domain.Services;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +21,22 @@ namespace InternetProvider.API.Extensions;
 
 public static class BuilderExtensions
 {
-    public static void AddDbContextServices(this WebApplicationBuilder builder)
+    public static void AddSqlServerEntities(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<ICity, City>();
+        builder.Services.AddScoped<IClient, Client>();
+        builder.Services.AddScoped<IClientStatus, ClientStatus>();
+        builder.Services.AddScoped<IHouse, House>();
+        builder.Services.AddScoped<IInternetConnectionRequest, InternetConnectionRequest>();
+        builder.Services.AddScoped<IInternetConnectionRequestStatus, InternetConnectionRequestStatus>();
+        builder.Services.AddScoped<IInternetTariff, InternetTariff>();
+        builder.Services.AddScoped<IInternetTariffStatus, InternetTariffStatus>();
+        builder.Services.AddScoped<ILocation, Location>();
+        builder.Services.AddScoped<ILocationType, LocationType>();
+        builder.Services.AddScoped<IStreet, Street>();
+    }
+    
+    public static void AddSqlServerDbContextServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<InternetProviderContext>(options =>
         {
@@ -26,27 +49,28 @@ public static class BuilderExtensions
         });
     }
     
-    public static void AddRepositoryServices(this WebApplicationBuilder builder)
+    public static void AddSqlServerRepositoryServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
     
-    public static void AddDomainServices(this WebApplicationBuilder builder)
+    public static void AddMappers(this WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<Domain.Interfaces.Services.ICityService, Domain.Services.CityService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IClientService, Domain.Services.ClientService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IClientStatusService, Domain.Services.ClientStatusService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IHouseService, Domain.Services.HouseService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.ILocationService, Domain.Services.LocationService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.ILocationTypeService, Domain.Services.LocationTypeService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IStreetService, Domain.Services.StreetService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetTariffStatusService, Domain.Services.InternetTariffStatusService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetConnectionRequestStatusService, Domain.Services.InternetConnectionRequestStatusService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetTariffService, Domain.Services.InternetTariffService>();
-        builder.Services.AddScoped<Domain.Interfaces.Services.IInternetConnectionRequestService, Domain.Services.InternetConnectionRequestService>();
+        builder.Services.AddScoped<IMapper<ICity, CityRequestDto, CityResponseDto>, CityMapper>();
+        builder.Services.AddScoped<IMapper<IClient, ClientRequestDto, ClientResponseDto>, ClientMapper>();
+        builder.Services.AddScoped<IUserMapper<IClient, RegisterClientRequestDto>, ClientMapper>();
+        builder.Services.AddScoped<IMapper<IClientStatus, ClientStatusRequestDto, ClientStatusResponseDto>, ClientStatusMapper>();
+        builder.Services.AddScoped<IMapper<IHouse, HouseRequestDto, HouseResponseDto>, HouseMapper>();
+        builder.Services.AddScoped<IMapper<IInternetConnectionRequest, InternetConnectionRequestRequestDto, InternetConnectionRequestResponseDto>, InternetConnectionRequestMapper>();
+        builder.Services.AddScoped<IMapper<IInternetConnectionRequestStatus, InternetConnectionRequestStatusRequestDto, InternetConnectionRequestStatusResponseDto>, InternetConnectionRequestStatusMapper>();
+        builder.Services.AddScoped<IMapper<IInternetTariff, InternetTariffRequestDto, InternetTariffResponseDto>, InternetTariffMapper>();
+        builder.Services.AddScoped<IMapper<IInternetTariffStatus, InternetTariffStatusRequestDto, InternetTariffStatusResponseDto>, InternetTariffStatusMapper>();
+        builder.Services.AddScoped<IMapper<ILocation, LocationRequestDto, LocationResponseDto>, LocationMapper>();
+        builder.Services.AddScoped<IMapper<ILocationType, LocationTypeRequestDto, LocationTypeResponseDto>, LocationTypeMapper>();
+        builder.Services.AddScoped<IMapper<IStreet, StreetRequestDto, StreetResponseDto>, StreetMapper>();
     }
     
-    public static void AddApplicationCrudServices(this WebApplicationBuilder builder)
+    public static void AddCrudServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ICityService, CityService>();
         builder.Services.AddScoped<IClientService, ClientService>();
@@ -61,7 +85,7 @@ public static class BuilderExtensions
         builder.Services.AddScoped<IInternetConnectionRequestService, InternetConnectionRequestService>();
     }
     
-    public static void AddApplicationAuthServices(this WebApplicationBuilder builder)
+    public static void AddAuthServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IClientRegisterService, ClientRegisterService>();
         builder.Services.AddScoped<IClientLoginService, ClientLoginService>();

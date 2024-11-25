@@ -1,6 +1,9 @@
-using InternetProvider.Application.DTOs.RequestDTOs;
-using InternetProvider.Application.Interfaces.Services;
-using InternetProvider.Infrastructure.Exceptions;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Exceptions;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.API.DTOs.RequestDTOs;
+using InternetProvider.API.DTOs.ResponseDTOs;
+using InternetProvider.API.Mappers.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,15 +11,15 @@ namespace InternetProvider.API.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class CityController(ICityService appService) : ControllerBase
+public class CityController(ICityService service, IMapper<ICity, CityRequestDto, CityResponseDto> mapper) : ControllerBase
 {
     [HttpGet("{id:int:min(1)}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         try
         {
-            var responseObj = await appService.GetByIdAsync(id);
-            return Ok(responseObj);
+            var response = await service.GetByIdAsync(id);
+            return Ok(mapper.ToResponseDto(response));
         }
         catch (RepositoryException e)
         {
@@ -33,8 +36,8 @@ public class CityController(ICityService appService) : ControllerBase
     {
         try
         {
-            var responseObj = await appService.GetAllAsync();
-            return Ok(responseObj);
+            var response = await service.GetAllAsync();
+            return Ok(response.Select(mapper.ToResponseDto));
         }
         catch (Exception e)
         {
@@ -48,7 +51,7 @@ public class CityController(ICityService appService) : ControllerBase
     {
         try
         {
-            await appService.AddAsync(dto);
+            await service.AddAsync(mapper.ToEntity(dto));
             return Created();
         }
         catch (RepositoryException e)
@@ -68,7 +71,7 @@ public class CityController(ICityService appService) : ControllerBase
     {
         try
         {
-            await appService.UpdateAsync(id, dto);
+            await service.UpdateAsync(id, mapper.ToEntity(dto));
             return NoContent();
         }
         catch (RepositoryException e)
@@ -87,7 +90,7 @@ public class CityController(ICityService appService) : ControllerBase
     {
         try
         {
-            await appService.DeleteAsync(id);
+            await service.DeleteAsync(id);
             return NoContent();
         }
         catch (RepositoryException e)

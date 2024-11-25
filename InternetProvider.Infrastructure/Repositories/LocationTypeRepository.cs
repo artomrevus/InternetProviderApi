@@ -1,6 +1,7 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class LocationTypeRepository(InternetProviderContext context) : ILocationTypeRepository
 {
-    public async Task<LocationType> GetByIdAsync(int id)
+    public async Task<ILocationType> GetByIdAsync(int id)
     {
         var locationType = await context.LocationTypes.FindAsync(id);
         if (locationType is null)
@@ -19,17 +20,24 @@ public class LocationTypeRepository(InternetProviderContext context) : ILocation
         return locationType;
     }
 
-    public async Task<IEnumerable<LocationType>> GetAllAsync()
+    public async Task<IEnumerable<ILocationType>> GetAllAsync()
     {
         return await context.LocationTypes.ToListAsync();
     }
 
-    public async Task AddAsync(LocationType entity)
+    public async Task AddAsync(ILocationType entity)
     {
-        await context.LocationTypes.AddAsync(entity);
+        if (entity is LocationType locationTypeEntity)
+        {
+            await context.LocationTypes.AddAsync(locationTypeEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type LocationType.");
+        }
     }
 
-    public async Task UpdateAsync(int id, LocationType entity)
+    public async Task UpdateAsync(int id, ILocationType entity)
     {
         var locationType = await context.LocationTypes.FindAsync(id);
         if (locationType is null)

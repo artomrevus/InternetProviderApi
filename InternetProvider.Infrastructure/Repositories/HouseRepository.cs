@@ -1,6 +1,7 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class HouseRepository(InternetProviderContext context) : IHouseRepository
 {
-    public async Task<House> GetByIdAsync(int id)
+    public async Task<IHouse> GetByIdAsync(int id)
     {
         var house = await context.Houses
             .Include(x => x.Street)
@@ -23,19 +24,26 @@ public class HouseRepository(InternetProviderContext context) : IHouseRepository
         return house;
     }
 
-    public Task<IEnumerable<House>> GetAllAsync()
+    public Task<IEnumerable<IHouse>> GetAllAsync()
     {
-        return Task.FromResult<IEnumerable<House>>(context.Houses
+        return Task.FromResult<IEnumerable<IHouse>>(context.Houses
             .Include(x => x.Street)
             .ThenInclude(x => x.City));
     }
 
-    public async Task AddAsync(House entity)
+    public async Task AddAsync(IHouse entity)
     {
-        await context.Houses.AddAsync(entity);
+        if (entity is House houseEntity)
+        {
+            await context.Houses.AddAsync(houseEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type House.");
+        }
     }
 
-    public async Task UpdateAsync(int id, House entity)
+    public async Task UpdateAsync(int id, IHouse entity)
     {
         var house = await context.Houses.FindAsync(id);
         if (house is null)

@@ -1,13 +1,14 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 
 namespace InternetProvider.Infrastructure.Repositories;
 
 public class InternetConnectionRequestStatusRepository(InternetProviderContext context) : IInternetConnectionRequestStatusRepository
 {
-    public async Task<InternetConnectionRequestStatus> GetByIdAsync(int id)
+    public async Task<IInternetConnectionRequestStatus> GetByIdAsync(int id)
     {
         var internetConnectionRequestStatus = await context.InternetConnectionRequestStatuses.FindAsync(id);
         if (internetConnectionRequestStatus is null)
@@ -18,17 +19,24 @@ public class InternetConnectionRequestStatusRepository(InternetProviderContext c
         return internetConnectionRequestStatus;
     }
 
-    public Task<IEnumerable<InternetConnectionRequestStatus>> GetAllAsync()
+    public Task<IEnumerable<IInternetConnectionRequestStatus>> GetAllAsync()
     {
-        return Task.FromResult<IEnumerable<InternetConnectionRequestStatus>>(context.InternetConnectionRequestStatuses);
+        return Task.FromResult<IEnumerable<IInternetConnectionRequestStatus>>(context.InternetConnectionRequestStatuses);
     }
 
-    public async Task AddAsync(InternetConnectionRequestStatus entity)
+    public async Task AddAsync(IInternetConnectionRequestStatus entity)
     {
-        await context.InternetConnectionRequestStatuses.AddAsync(entity);
+        if (entity is InternetConnectionRequestStatus internetConnectionRequestStatusEntity)
+        {
+            await context.InternetConnectionRequestStatuses.AddAsync(internetConnectionRequestStatusEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type InternetConnectionRequestStatus.");
+        }
     }
 
-    public async Task UpdateAsync(int id, InternetConnectionRequestStatus entity)
+    public async Task UpdateAsync(int id, IInternetConnectionRequestStatus entity)
     {
         var internetConnectionRequestStatus = await context.InternetConnectionRequestStatuses.FindAsync(id);
         if (internetConnectionRequestStatus is null)

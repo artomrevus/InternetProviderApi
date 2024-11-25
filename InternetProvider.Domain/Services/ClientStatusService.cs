@@ -1,46 +1,40 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class ClientStatusService(IUnitOfWork unitOfWork) : IClientStatusService
 {
-    public async Task<ClientStatusOutput> GetByIdAsync(int id)
+    public async Task<IClientStatus> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.ClientStatuses.GetByIdAsync(id);
-        return repositoryEntity.ToDomainClientStatusOutput();
+        return await unitOfWork.ClientStatuses.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<ClientStatusOutput>> GetAllAsync()
+    public async Task<IEnumerable<IClientStatus>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.ClientStatuses.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainClientStatusOutput());
+        return await unitOfWork.ClientStatuses.GetAllAsync();
     }
 
-    public async Task AddAsync(ClientStatusInput entity)
+    public async Task AddAsync(IClientStatus entity)
     {
         var entities = await unitOfWork.ClientStatuses.GetAllAsync();
         var entitiesList = entities.ToList();
         
         var lastEntityId = entitiesList.Count != 0 ? entitiesList.Last().ClientStatusId : 0;
         
-        var repositoryEntity = entity.ToInfrastructureClientStatus();
-        repositoryEntity.ClientStatusId = lastEntityId + 1;
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.ClientStatusId = lastEntityId + 1;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.ClientStatuses.AddAsync(repositoryEntity);
+        await unitOfWork.ClientStatuses.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, ClientStatusInput entity)
+    public async Task UpdateAsync(int id, IClientStatus entity)
     {
-        var repositoryEntity = entity.ToInfrastructureClientStatus();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.ClientStatuses.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.ClientStatuses.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

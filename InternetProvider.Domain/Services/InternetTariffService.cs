@@ -1,38 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class InternetTariffService(IUnitOfWork unitOfWork) : IInternetTariffService
 {
-    public async Task<InternetTariffOutput> GetByIdAsync(int id)
+    public async Task<IInternetTariff> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.InternetTariffs.GetByIdAsync(id);
-        return repositoryEntity.ToDomainInternetTariffOutput();
+        return await unitOfWork.InternetTariffs.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<InternetTariffOutput>> GetAllAsync()
+    public async Task<IEnumerable<IInternetTariff>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.InternetTariffs.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainInternetTariffOutput());
+        return await unitOfWork.InternetTariffs.GetAllAsync();
     }
 
-    public async Task AddAsync(InternetTariffInput entity)
+    public async Task AddAsync(IInternetTariff entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetTariff();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetTariffs.AddAsync(repositoryEntity);
+        entity.CreateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetTariffs.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, InternetTariffInput entity)
+    public async Task UpdateAsync(int id, IInternetTariff entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetTariff();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetTariffs.UpdateAsync(id, repositoryEntity);
+        entity.UpdateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetTariffs.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

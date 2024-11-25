@@ -1,4 +1,4 @@
-using InternetProvider.Infrastructure.Exceptions;
+using InternetProvider.Abstraction.Exceptions;
 
 namespace InternetProvider.Infrastructure.Repositories.Extensions;
 

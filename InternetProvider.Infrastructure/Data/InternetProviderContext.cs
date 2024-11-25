@@ -1,4 +1,5 @@
-﻿using InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
+using InternetProvider.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace InternetProvider.Infrastructure.Data;

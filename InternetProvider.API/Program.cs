@@ -5,11 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.AddDbContextServices();
-builder.AddRepositoryServices();
-builder.AddDomainServices();
-builder.AddApplicationCrudServices();
-builder.AddApplicationAuthServices();
+builder.AddSqlServerEntities();
+builder.AddSqlServerDbContextServices();
+builder.AddSqlServerRepositoryServices();
+builder.AddMappers();
+builder.AddCrudServices();
+builder.AddAuthServices();
 builder.AddIdentityServices();
 
 builder.Services.AddControllers();

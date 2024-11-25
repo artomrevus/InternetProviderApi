@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class InternetTariffStatus
+namespace InternetProvider.Infrastructure.Models;
+
+public class InternetTariffStatus : IInternetTariffStatus
 {
     public int InternetTariffStatusId { get; set; }
 
@@ -11,4 +13,10 @@ public class InternetTariffStatus
     public DateTime? UpdateDateTime { get; set; }
 
     public virtual ICollection<InternetTariff> InternetTariffs { get; set; } = new List<InternetTariff>();
+    
+    ICollection<IInternetTariff> IInternetTariffStatus.InternetTariffs
+    {
+        get => InternetTariffs.Cast<IInternetTariff>().ToList();
+        set => InternetTariffs = value.Cast<InternetTariff>().ToList();
+    }
 }

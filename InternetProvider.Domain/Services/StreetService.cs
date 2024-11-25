@@ -1,40 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class StreetService(IUnitOfWork unitOfWork) : IStreetService
 {
-    public async Task<StreetOutput> GetByIdAsync(int id)
+    public async Task<IStreet> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.Streets.GetByIdAsync(id);
-        return repositoryEntity.ToDomainStreetOutput();
+        return await unitOfWork.Streets.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<StreetOutput>> GetAllAsync()
+    public async Task<IEnumerable<IStreet>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.Streets.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainStreetOutput());
+        return await unitOfWork.Streets.GetAllAsync();
     }
 
-    public async Task AddAsync(StreetInput entity)
+    public async Task AddAsync(IStreet entity)
     {
-        var repositoryEntity = entity.ToInfrastructureStreet();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Streets.AddAsync(repositoryEntity);
+        await unitOfWork.Streets.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, StreetInput entity)
+    public async Task UpdateAsync(int id, IStreet entity)
     {
-        var repositoryEntity = entity.ToInfrastructureStreet();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Streets.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.Streets.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class InternetConnectionRequestStatus
+namespace InternetProvider.Infrastructure.Models;
+
+public class InternetConnectionRequestStatus : IInternetConnectionRequestStatus
 {
     public int InternetConnectionRequestStatusId { get; set; }
 
@@ -11,4 +13,10 @@ public class InternetConnectionRequestStatus
     public DateTime? UpdateDateTime { get; set; }
 
     public virtual ICollection<InternetConnectionRequest> InternetConnectionRequests { get; set; } = new List<InternetConnectionRequest>();
+    
+    ICollection<IInternetConnectionRequest> IInternetConnectionRequestStatus.InternetConnectionRequests
+    {
+        get => InternetConnectionRequests.Cast<IInternetConnectionRequest>().ToList();
+        set => InternetConnectionRequests = value.Cast<InternetConnectionRequest>().ToList();
+    }
 }

@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
-using InternetProvider.GeneralTypes.Sort;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Sort;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using InternetProvider.Infrastructure.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class LocationRepository(InternetProviderContext context) : ILocationRepository
 {
-    public async Task<Location> GetByIdAsync(int id)
+    public async Task<ILocation> GetByIdAsync(int id)
     {
         var location = await context.Locations
             .Include(x => x.LocationType)
@@ -28,7 +29,7 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
         return location;
     }
 
-    public async Task<IEnumerable<Location>> GetAllAsync()
+    public async Task<IEnumerable<ILocation>> GetAllAsync()
     {
         return await context.Locations
             .Include(x => x.LocationType)
@@ -38,12 +39,19 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
             .ToListAsync();
     }
     
-    public async Task AddAsync(Location entity)
+    public async Task AddAsync(ILocation entity)
     {
-        await context.Locations.AddAsync(entity);
+        if (entity is Location locationEntity)
+        {
+            await context.Locations.AddAsync(locationEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type Location.");
+        }
     }
 
-    public async Task UpdateAsync(int id, Location entity)
+    public async Task UpdateAsync(int id, ILocation entity)
     {
         var location = await context.Locations.FindAsync(id);
         if (location is null)
@@ -68,13 +76,13 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
         context.Locations.Remove(location);
     }
     
-    public Task<IEnumerable<Location>> GetAsync(
+    public Task<IEnumerable<ILocation>> GetAsync(
         Dictionary<string, object>? filter,
         Dictionary<string, SortType>? sort,
         int? pageNumber,
         int? pageSize)
     {
-        IQueryable<Location> locations = context.Locations
+        IQueryable<ILocation> locations = context.Locations
             .Include(x => x.LocationType)
             .Include(x => x.House)
             .ThenInclude(x => x.Street)
@@ -100,7 +108,7 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
 
     public async Task<int> CountAsync(Dictionary<string, object>? filter)
     {
-        IQueryable<Location> locations = context.Locations
+        IQueryable<ILocation> locations = context.Locations
             .Include(x => x.LocationType)
             .Include(x => x.House)
             .ThenInclude(x => x.Street)
@@ -114,7 +122,7 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
         return await locations.CountAsync();
     }
 
-    private IQueryable<Location> ApplyFilter(IQueryable<Location> locations, Dictionary<string, object> filters)
+    private IQueryable<ILocation> ApplyFilter(IQueryable<ILocation> locations, Dictionary<string, object> filters)
     {
         foreach (var filter in filters)
         {
@@ -135,15 +143,15 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
         return locations;
     }
 
-    private IQueryable<Location> ApplySort(IQueryable<Location> locations, Dictionary<string, SortType> sorts)
+    private IQueryable<ILocation> ApplySort(IQueryable<ILocation> locations, Dictionary<string, SortType> sorts)
     {
-        IOrderedQueryable<Location>? orderedLocations = null;
+        IOrderedQueryable<ILocation>? orderedLocations = null;
 
         foreach (var sort in sorts)
         {
             var sortFieldLower = sort.Key.ToLowerInvariant();
             
-            Expression<Func<Location, object>> keySelector = sortFieldLower switch
+            Expression<Func<ILocation, object>> keySelector = sortFieldLower switch
             {
                 "cityname" => x => x.House.Street.City.CityName!,
                 "streetname" => x => x.House.Street.StreetName!,
@@ -161,7 +169,7 @@ public class LocationRepository(InternetProviderContext context) : ILocationRepo
         return orderedLocations ?? locations;
     }
 
-    private IQueryable<Location> ApplyPagination(IQueryable<Location> locations, int pageNumber, int pageSize)
+    private IQueryable<ILocation> ApplyPagination(IQueryable<ILocation> locations, int pageNumber, int pageSize)
     {
         if (pageNumber < 1 || pageSize < 1)
         {

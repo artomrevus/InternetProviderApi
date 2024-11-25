@@ -1,45 +1,40 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class InternetTariffStatusService(IUnitOfWork unitOfWork) : IInternetTariffStatusService
 {
-    public async Task<InternetTariffStatusOutput> GetByIdAsync(int id)
+    public async Task<IInternetTariffStatus> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.InternetTariffStatuses.GetByIdAsync(id);
-        return repositoryEntity.ToDomainInternetTariffStatusOutput();
+        return await unitOfWork.InternetTariffStatuses.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<InternetTariffStatusOutput>> GetAllAsync()
+    public async Task<IEnumerable<IInternetTariffStatus>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.InternetTariffStatuses.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainInternetTariffStatusOutput());
+        return await unitOfWork.InternetTariffStatuses.GetAllAsync();
     }
 
-    public async Task AddAsync(InternetTariffStatusInput entity)
+    public async Task AddAsync(IInternetTariffStatus entity)
     {
         var entities = await unitOfWork.InternetTariffStatuses.GetAllAsync();
         var entitiesList = entities.ToList();
         
         var lastEntityId = entitiesList.Count != 0 ? entitiesList.Last().InternetTariffStatusId : 0;
         
-        var repositoryEntity = entity.ToInfrastructureInternetTariffStatus();
-        repositoryEntity.InternetTariffStatusId = lastEntityId + 1;
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.InternetTariffStatusId = lastEntityId + 1;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.InternetTariffStatuses.AddAsync(repositoryEntity);
+        await unitOfWork.InternetTariffStatuses.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, InternetTariffStatusInput entity)
+    public async Task UpdateAsync(int id, IInternetTariffStatus entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetTariffStatus();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetTariffStatuses.UpdateAsync(id, repositoryEntity);
+        entity.UpdateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetTariffStatuses.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

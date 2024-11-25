@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
-using InternetProvider.GeneralTypes.Sort;
-using InternetProvider.Infrastructure.Models;
+using InternetProvider.Abstraction.Sort;
 
 namespace InternetProvider.Infrastructure.Repositories.Extensions;
 

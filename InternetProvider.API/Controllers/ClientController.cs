@@ -1,9 +1,11 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Exceptions;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.Abstraction.Sort;
+using InternetProvider.API.DTOs.RequestDTOs;
+using InternetProvider.API.DTOs.ResponseDTOs;
 using InternetProvider.API.Extensions;
-using InternetProvider.Application.DTOs.RequestDTOs;
-using InternetProvider.Application.DTOs.ResponseDTOs;
-using InternetProvider.Application.Interfaces.Services;
-using InternetProvider.GeneralTypes.Sort;
-using InternetProvider.Infrastructure.Exceptions;
+using InternetProvider.API.Mappers.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,7 @@ namespace InternetProvider.API.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class ClientController(IClientService appService) : ControllerBase
+public class ClientController(IClientService service, IMapper<IClient, ClientRequestDto, ClientResponseDto> mapper) : ControllerBase
 {
     [HttpGet("{id:int:min(1)}")]
     [Authorize(Roles = "Admin, Client")]
@@ -25,14 +27,14 @@ public class ClientController(IClientService appService) : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError, "User id not found.");
             }
             
-            var hasUserAccess = await appService.HasUserAccess(id, userId);
+            var hasUserAccess = await service.HasUserAccess(id, userId);
             if (!hasUserAccess)
             {
                 return Forbid();
             }
             
-            var responseObj = await appService.GetByIdAsync(id);
-            return Ok(responseObj);
+            var responseObj = await service.GetByIdAsync(id);
+            return Ok(mapper.ToResponseDto(responseObj));
         }
         catch (RepositoryException e)
         {
@@ -54,21 +56,21 @@ public class ClientController(IClientService appService) : ControllerBase
     {
         try
         {
-            IEnumerable<ClientResponseDto> responseObj;
+            IEnumerable<IClient> responseObj;
             if (filter is null && sort is null && pageNumber is null && pageSize is null)
             {
-                responseObj = await appService.GetAllAsync();
+                responseObj = await service.GetAllAsync();
             }
             else
             {
-                responseObj = await appService.GetAsync(
+                responseObj = await service.GetAsync(
                     filter.FromJsonToDictionary<string, object>(),
                     sort.FromJsonToDictionary<string, SortType>(),
                     pageNumber,
                     pageSize);
             }
             
-            return Ok(responseObj);
+            return Ok(responseObj.Select(mapper.ToResponseDto));
         }
         catch (Exception e)
         {
@@ -83,7 +85,7 @@ public class ClientController(IClientService appService) : ControllerBase
     {
         try
         {
-            var count = await appService.CountAsync(filter.FromJsonToDictionary<string, object>());
+            var count = await service.CountAsync(filter.FromJsonToDictionary<string, object>());
             return Ok(count);
         }
         catch (Exception e)
@@ -98,7 +100,7 @@ public class ClientController(IClientService appService) : ControllerBase
     {
         try
         {
-            await appService.AddAsync(dto);
+            await service.AddAsync(mapper.ToEntity(dto));
             return Created();
         }
         catch (RepositoryException e)
@@ -124,13 +126,13 @@ public class ClientController(IClientService appService) : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError, "User id not found.");
             }
             
-            var hasUserAccess = await appService.HasUserAccess(accessedId: id, userId);
+            var hasUserAccess = await service.HasUserAccess(accessedId: id, userId);
             if (!hasUserAccess)
             {
                 return Forbid();
             }
             
-            await appService.UpdateAsync(id, dto);
+            await service.UpdateAsync(id, mapper.ToEntity(dto));
             return NoContent();
         }
         catch (RepositoryException e)
@@ -149,7 +151,7 @@ public class ClientController(IClientService appService) : ControllerBase
     {
         try
         {
-            await appService.DeleteAsync(id);
+            await service.DeleteAsync(id);
             return NoContent();
         }
         catch (RepositoryException e)

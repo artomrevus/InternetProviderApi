@@ -1,40 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class LocationTypeService(IUnitOfWork unitOfWork) : ILocationTypeService
 {
-    public async Task<LocationTypeOutput> GetByIdAsync(int id)
+    public async Task<ILocationType> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.LocationTypes.GetByIdAsync(id);
-        return repositoryEntity.ToDomainLocationTypeOutput();
+        return await unitOfWork.LocationTypes.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<LocationTypeOutput>> GetAllAsync()
+    public async Task<IEnumerable<ILocationType>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.LocationTypes.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainLocationTypeOutput());
+        return await unitOfWork.LocationTypes.GetAllAsync();
     }
 
-    public async Task AddAsync(LocationTypeInput entity)
+    public async Task AddAsync(ILocationType entity)
     {
-        var repositoryEntity = entity.ToInfrastructureLocationType();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.LocationTypes.AddAsync(repositoryEntity);
+        await unitOfWork.LocationTypes.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, LocationTypeInput entity)
+    public async Task UpdateAsync(int id, ILocationType entity)
     {
-        var repositoryEntity = entity.ToInfrastructureLocationType();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.LocationTypes.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.LocationTypes.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

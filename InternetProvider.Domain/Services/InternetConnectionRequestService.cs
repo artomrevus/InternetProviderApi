@@ -1,40 +1,36 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.GeneralTypes.Sort;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.Abstraction.Sort;
 
 namespace InternetProvider.Domain.Services;
 
 public class InternetConnectionRequestService(IUnitOfWork unitOfWork) : IInternetConnectionRequestService
 {
-    public async Task<InternetConnectionRequestOutput> GetByIdAsync(int id)
+    public async Task<IInternetConnectionRequest> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.InternetConnectionRequests.GetByIdAsync(id);
-        return repositoryEntity.ToDomainInternetConnectionRequestOutput();
+        return await unitOfWork.InternetConnectionRequests.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<InternetConnectionRequestOutput>> GetAllAsync()
+    public async Task<IEnumerable<IInternetConnectionRequest>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.InternetConnectionRequests.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainInternetConnectionRequestOutput());
+        return await unitOfWork.InternetConnectionRequests.GetAllAsync();
     }
 
-    public async Task AddAsync(InternetConnectionRequestInput entity)
+    public async Task AddAsync(IInternetConnectionRequest entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetConnectionRequest();
-        repositoryEntity.RequestDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetConnectionRequests.AddAsync(repositoryEntity);
+        entity.RequestDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        entity.CreateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetConnectionRequests.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, InternetConnectionRequestInput entity)
+    public async Task UpdateAsync(int id, IInternetConnectionRequest entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetConnectionRequest();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetConnectionRequests.UpdateAsync(id, repositoryEntity);
+        entity.UpdateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetConnectionRequests.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 
@@ -44,10 +40,9 @@ public class InternetConnectionRequestService(IUnitOfWork unitOfWork) : IInterne
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task<IEnumerable<InternetConnectionRequestOutput>> GetAsync(Dictionary<string, object>? filter, Dictionary<string, SortType>? sort, int? pageNumber, int? pageSize)
+    public async Task<IEnumerable<IInternetConnectionRequest>> GetAsync(Dictionary<string, object>? filter, Dictionary<string, SortType>? sort, int? pageNumber, int? pageSize)
     {
-        var repositoryEntities = await unitOfWork.InternetConnectionRequests.GetAsync(filter, sort, pageNumber, pageSize);
-        return repositoryEntities.Select(x => x.ToDomainInternetConnectionRequestOutput());
+        return await unitOfWork.InternetConnectionRequests.GetAsync(filter, sort, pageNumber, pageSize);
     }
 
     public async Task<int> CountAsync(Dictionary<string, object>? filter)

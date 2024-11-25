@@ -1,6 +1,5 @@
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Exceptions;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 

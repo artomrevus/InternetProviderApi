@@ -1,40 +1,38 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.GeneralTypes.Sort;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Exceptions;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
+using InternetProvider.Abstraction.Sort;
+using Microsoft.AspNetCore.Identity;
 
 namespace InternetProvider.Domain.Services;
 
-public class ClientService(IUnitOfWork unitOfWork) : IClientService
+public class ClientService(IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager) : IClientService
 {
-    public async Task<ClientOutput> GetByIdAsync(int id)
+    public async Task<IClient> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.Clients.GetByIdAsync(id);
-        return repositoryEntity.ToDomainClientOutput();
+        return await unitOfWork.Clients.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<ClientOutput>> GetAllAsync()
+    public async Task<IEnumerable<IClient>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.Clients.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainClientOutput());
+        return await unitOfWork.Clients.GetAllAsync();
     }
 
-    public async Task AddAsync(ClientInput entity)
+    public async Task AddAsync(IClient entity)
     {
-        var repositoryEntity = entity.ToInfrastructureClient();
-        repositoryEntity.RegistrationDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
-        await unitOfWork.Clients.AddAsync(repositoryEntity);
+        entity.RegistrationDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        entity.CreateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.Clients.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, ClientInput entity)
+    public async Task UpdateAsync(int id, IClient entity)
     {
-        var repositoryEntity = entity.ToInfrastructureClient();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
-        await unitOfWork.Clients.UpdateAsync(id, repositoryEntity);
+        entity.UpdateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.Clients.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 
@@ -49,18 +47,39 @@ public class ClientService(IUnitOfWork unitOfWork) : IClientService
         return await unitOfWork.Clients.GetIdByUserIdAsync(userId);
     }
 
-    public async Task<IEnumerable<ClientOutput>> GetAsync(
+    public async Task<IEnumerable<IClient>> GetAsync(
         Dictionary<string, object>? filter, 
         Dictionary<string, SortType>? sort, 
         int? pageNumber,
         int? pageSize)
     {
-        var repositoryEntities = await unitOfWork.Clients.GetAsync(filter, sort, pageNumber, pageSize);
-        return repositoryEntities.Select(x => x.ToDomainClientOutput());
+        return await unitOfWork.Clients.GetAsync(filter, sort, pageNumber, pageSize);
     }
 
     public async Task<int> CountAsync(Dictionary<string, object>? filter)
     {
         return await unitOfWork.Clients.CountAsync(filter);
+    }
+    
+    public async Task<bool> HasUserAccess(int accessedId, string userId)
+    {
+        var identityUser = await userManager.FindByIdAsync(userId);
+        if (identityUser is null)
+        {
+            throw new AccessException($"No users found with id {userId}.");
+        }
+        
+        var userRoles = await userManager.GetRolesAsync(identityUser);
+        if (userRoles.Contains("Admin"))
+        {
+            return true;
+        }
+
+        if (userRoles.Contains("Client"))
+        {
+            return accessedId == await this.GetIdByUserIdAsync(userId);
+        }
+
+        return false;
     }
 }

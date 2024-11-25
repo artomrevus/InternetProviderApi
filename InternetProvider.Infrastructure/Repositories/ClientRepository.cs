@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
-using InternetProvider.GeneralTypes.Sort;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Sort;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using InternetProvider.Infrastructure.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class ClientRepository(InternetProviderContext context) : IClientRepository
 {
-    public async Task<Client> GetByIdAsync(int id)
+    public async Task<IClient> GetByIdAsync(int id)
     {
         var client = await context.Clients
             .Include(x => x.ClientStatus)
@@ -31,7 +32,7 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         return client;
     }
 
-    public async Task<IEnumerable<Client>> GetAllAsync()
+    public async Task<IEnumerable<IClient>> GetAllAsync()
     {
         return await context.Clients
             .Include(x => x.ClientStatus)
@@ -44,12 +45,19 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
             .ToListAsync();
     }
 
-    public async Task AddAsync(Client entity)
+    public async Task AddAsync(IClient entity)
     {
-        await context.Clients.AddAsync(entity);
+        if (entity is Client clientEntity)
+        {
+            await context.Clients.AddAsync(clientEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type Client.");
+        }
     }
 
-    public async Task UpdateAsync(int id, Client entity)
+    public async Task UpdateAsync(int id, IClient entity)
     {
         var client = await context.Clients.FindAsync(id);
         if (client is null)
@@ -89,13 +97,13 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         return client.ClientId;
     }
     
-    public Task<IEnumerable<Client>> GetAsync(
+    public Task<IEnumerable<IClient>> GetAsync(
         Dictionary<string, object>? filter, 
         Dictionary<string, SortType>? sort, 
         int? pageNumber,
         int? pageSize)
     {
-        IQueryable<Client> clients = context.Clients
+        IQueryable<IClient> clients = context.Clients
             .Include(x => x.ClientStatus)
             .Include(x => x.Location)
             .ThenInclude(x => x.LocationType)
@@ -124,7 +132,7 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
     
     public async Task<int> CountAsync(Dictionary<string, object>? filter)
     {
-        IQueryable<Client> clients = context.Clients
+        IQueryable<IClient> clients = context.Clients
             .Include(x => x.ClientStatus)
             .Include(x => x.Location)
             .ThenInclude(x => x.LocationType)
@@ -141,7 +149,7 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         return await clients.CountAsync();
     }
 
-    private IQueryable<Client> ApplyFilter(IQueryable<Client> clients, Dictionary<string, object> filters)
+    private IQueryable<IClient> ApplyFilter(IQueryable<IClient> clients, Dictionary<string, object> filters)
     {
         foreach (var filter in filters)
         {
@@ -169,15 +177,15 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         return clients;
     }
     
-    private IQueryable<Client> ApplySort(IQueryable<Client> clients, Dictionary<string, SortType> sorts)
+    private IQueryable<IClient> ApplySort(IQueryable<IClient> clients, Dictionary<string, SortType> sorts)
     {
-        IOrderedQueryable<Client>? orderedClients = null;
+        IOrderedQueryable<IClient>? orderedClients = null;
 
         foreach (var sort in sorts)
         {
             var sortFieldLower = sort.Key.ToLowerInvariant();
             
-            Expression<Func<Client, object>> keySelector = sortFieldLower switch
+            Expression<Func<IClient, object>> keySelector = sortFieldLower switch
             {
                 "clientstatusname" => x => x.ClientStatus.ClientStatusName!,
                 "locationtypename" => x => x.Location.LocationType.LocationTypeName!,
@@ -201,7 +209,7 @@ public class ClientRepository(InternetProviderContext context) : IClientReposito
         return orderedClients ?? clients;
     }
 
-    private IQueryable<Client> ApplyPagination(IQueryable<Client> clients, int pageNumber, int pageSize)
+    private IQueryable<IClient> ApplyPagination(IQueryable<IClient> clients, int pageNumber, int pageSize)
     {
         if (pageNumber < 1 || pageSize < 1)
         {

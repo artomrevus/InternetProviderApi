@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class Client
+namespace InternetProvider.Infrastructure.Models;
+
+public class Client : IClient
 {
     public int ClientId { get; set; }
 
@@ -23,10 +25,26 @@ public class Client
     public DateTime CreateDateTime { get; set; }
 
     public DateTime? UpdateDateTime { get; set; }
-
+    
     public virtual ClientStatus ClientStatus { get; set; } = null!;
-
     public virtual ICollection<InternetConnectionRequest> InternetConnectionRequests { get; set; } = new List<InternetConnectionRequest>();
-
     public virtual Location Location { get; set; } = null!;
+
+    IClientStatus IClient.ClientStatus
+    {
+        get => ClientStatus;
+        set => ClientStatus = (ClientStatus)value;
+    }
+
+    ICollection<IInternetConnectionRequest> IClient.InternetConnectionRequests
+    {
+        get => InternetConnectionRequests.Cast<IInternetConnectionRequest>().ToList();
+        set => InternetConnectionRequests = value.Cast<InternetConnectionRequest>().ToList();
+    }
+
+    ILocation IClient.Location
+    {
+        get => Location;
+        set => Location = (Location)value;
+    }
 }

@@ -1,40 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class CityService(IUnitOfWork unitOfWork) : ICityService
 {
-    public async Task<CityOutput> GetByIdAsync(int id)
+    public async Task<ICity> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.Cities.GetByIdAsync(id);
-        return repositoryEntity.ToDomainCityOutput();
+        return await unitOfWork.Cities.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<CityOutput>> GetAllAsync()
+    public async Task<IEnumerable<ICity>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.Cities.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainCityOutput());
+        return await unitOfWork.Cities.GetAllAsync();
     }
 
-    public async Task AddAsync(CityInput entity)
+    public async Task AddAsync(ICity entity)
     {
-        var repositoryEntity = entity.ToInfrastructureCity();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Cities.AddAsync(repositoryEntity);
+        await unitOfWork.Cities.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, CityInput entity)
+    public async Task UpdateAsync(int id, ICity entity)
     {
-        var repositoryEntity = entity.ToInfrastructureCity();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Cities.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.Cities.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

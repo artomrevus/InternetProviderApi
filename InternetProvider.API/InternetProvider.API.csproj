@@ -20,8 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\InternetProvider.Application\InternetProvider.Application.csproj" />
-      <ProjectReference Include="..\InternetProvider.GeneralTypes\InternetProvider.GeneralTypes.csproj" />
+      <ProjectReference Include="..\InternetProvider.Domain\InternetProvider.Domain.csproj" />
       <ProjectReference Include="..\InternetProvider.Infrastructure\InternetProvider.Infrastructure.csproj" />
     </ItemGroup>
 

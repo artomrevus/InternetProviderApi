@@ -1,6 +1,8 @@
-﻿namespace InternetProvider.Infrastructure.Models;
+﻿using InternetProvider.Abstraction.Entities;
 
-public class City
+namespace InternetProvider.Infrastructure.Models;
+
+public class City : ICity
 {
     public int CityId { get; set; }
 
@@ -13,4 +15,10 @@ public class City
     public virtual ICollection<Office> Offices { get; set; } = new List<Office>();
 
     public virtual ICollection<Street> Streets { get; set; } = new List<Street>();
+    
+    ICollection<IStreet> ICity.Streets
+    {
+        get => Streets.Cast<IStreet>().ToList();
+        set => Streets = value.Cast<Street>().ToList();
+    }
 }

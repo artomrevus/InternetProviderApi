@@ -1,6 +1,7 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace InternetProvider.Infrastructure.Repositories;
 
 public class StreetRepository(InternetProviderContext context) : IStreetRepository
 {
-    public async Task<Street> GetByIdAsync(int id)
+    public async Task<IStreet> GetByIdAsync(int id)
     {
         var street = await context.Streets
             .Include(x => x.City)
@@ -22,19 +23,26 @@ public class StreetRepository(InternetProviderContext context) : IStreetReposito
         return street;
     }
 
-    public async Task<IEnumerable<Street>> GetAllAsync()
+    public async Task<IEnumerable<IStreet>> GetAllAsync()
     {
         return await context.Streets
             .Include(x => x.City)
             .ToListAsync();
     }
 
-    public async Task AddAsync(Street entity)
+    public async Task AddAsync(IStreet entity)
     {
-        await context.Streets.AddAsync(entity);
+        if (entity is Street streetEntity)
+        {
+            await context.Streets.AddAsync(streetEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type Street.");
+        }
     }
 
-    public async Task UpdateAsync(int id, Street entity)
+    public async Task UpdateAsync(int id, IStreet entity)
     {
         var street = await context.Streets.FindAsync(id);
         if (street is null)

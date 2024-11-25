@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\InternetProvider.GeneralTypes\InternetProvider.GeneralTypes.csproj" />
+      <ProjectReference Include="..\InternetProvider.Abstraction\InternetProvider.Abstraction.csproj" />
     </ItemGroup>
 
 </Project>

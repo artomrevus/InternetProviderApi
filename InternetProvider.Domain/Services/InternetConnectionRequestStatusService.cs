@@ -1,38 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class InternetConnectionRequestStatusService(IUnitOfWork unitOfWork) : IInternetConnectionRequestStatusService
 {
-    public async Task<InternetConnectionRequestStatusOutput> GetByIdAsync(int id)
+    public async Task<IInternetConnectionRequestStatus> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.InternetConnectionRequestStatuses.GetByIdAsync(id);
-        return repositoryEntity.ToDomainInternetConnectionRequestStatusOutput();
+        return await unitOfWork.InternetConnectionRequestStatuses.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<InternetConnectionRequestStatusOutput>> GetAllAsync()
+    public async Task<IEnumerable<IInternetConnectionRequestStatus>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.InternetConnectionRequestStatuses.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainInternetConnectionRequestStatusOutput());
+        return await unitOfWork.InternetConnectionRequestStatuses.GetAllAsync();
     }
 
-    public async Task AddAsync(InternetConnectionRequestStatusInput entity)
+    public async Task AddAsync(IInternetConnectionRequestStatus entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetConnectionRequestStatus();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetConnectionRequestStatuses.AddAsync(repositoryEntity);
+        entity.CreateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetConnectionRequestStatuses.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, InternetConnectionRequestStatusInput entity)
+    public async Task UpdateAsync(int id, IInternetConnectionRequestStatus entity)
     {
-        var repositoryEntity = entity.ToInfrastructureInternetConnectionRequestStatus();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
-        await unitOfWork.InternetConnectionRequestStatuses.UpdateAsync(id, repositoryEntity);
+        entity.UpdateDateTime = DateTime.UtcNow;
+        
+        await unitOfWork.InternetConnectionRequestStatuses.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

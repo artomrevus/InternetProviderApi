@@ -10,4 +10,9 @@
       <ProjectReference Include="..\InternetProvider.Domain\InternetProvider.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Exception\" />
+      <Folder Include="Services\AuthServices\" />
+    </ItemGroup>
+
 </Project>

@@ -1,40 +1,34 @@
-using InternetProvider.Domain.Entities.Input;
-using InternetProvider.Domain.Entities.Output;
-using InternetProvider.Domain.Mappers;
-using InternetProvider.Domain.Interfaces.Services;
-using InternetProvider.Infrastructure.Interfaces.UnitOfWork;
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
+using InternetProvider.Abstraction.Services;
 
 namespace InternetProvider.Domain.Services;
 
 public class HouseService(IUnitOfWork unitOfWork) : IHouseService
 {
-    public async Task<HouseOutput> GetByIdAsync(int id)
+    public async Task<IHouse> GetByIdAsync(int id)
     {
-        var repositoryEntity = await unitOfWork.Houses.GetByIdAsync(id);
-        return repositoryEntity.ToDomainHouseOutput();
+        return await unitOfWork.Houses.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<HouseOutput>> GetAllAsync()
+    public async Task<IEnumerable<IHouse>> GetAllAsync()
     {
-        var repositoryEntities = await unitOfWork.Houses.GetAllAsync();
-        return repositoryEntities.Select(x => x.ToDomainHouseOutput());
+        return await unitOfWork.Houses.GetAllAsync();
     }
 
-    public async Task AddAsync(HouseInput entity)
+    public async Task AddAsync(IHouse entity)
     {
-        var repositoryEntity = entity.ToInfrastructureHouse();
-        repositoryEntity.CreateDateTime = DateTime.UtcNow;
+        entity.CreateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Houses.AddAsync(repositoryEntity);
+        await unitOfWork.Houses.AddAsync(entity);
         await unitOfWork.CompleteAsync();
     }
 
-    public async Task UpdateAsync(int id, HouseInput entity)
+    public async Task UpdateAsync(int id, IHouse entity)
     {
-        var repositoryEntity = entity.ToInfrastructureHouse();
-        repositoryEntity.UpdateDateTime = DateTime.UtcNow;
+        entity.UpdateDateTime = DateTime.UtcNow;
         
-        await unitOfWork.Houses.UpdateAsync(id, repositoryEntity);
+        await unitOfWork.Houses.UpdateAsync(id, entity);
         await unitOfWork.CompleteAsync();
     }
 

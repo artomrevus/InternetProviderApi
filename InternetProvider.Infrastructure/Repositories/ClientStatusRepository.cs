@@ -1,13 +1,14 @@
+using InternetProvider.Abstraction.Entities;
+using InternetProvider.Abstraction.Repositories;
 using InternetProvider.Infrastructure.Data;
-using InternetProvider.Infrastructure.Exceptions;
-using InternetProvider.Infrastructure.Interfaces.Repositories;
+using InternetProvider.Abstraction.Exceptions;
 using InternetProvider.Infrastructure.Models;
 
 namespace InternetProvider.Infrastructure.Repositories;
 
 public class ClientStatusRepository(InternetProviderContext context) : IClientStatusRepository
 {
-    public async Task<ClientStatus> GetByIdAsync(int id)
+    public async Task<IClientStatus> GetByIdAsync(int id)
     {
         var clientStatus = await context.ClientStatuses.FindAsync(id);
         if (clientStatus is null)
@@ -18,17 +19,24 @@ public class ClientStatusRepository(InternetProviderContext context) : IClientSt
         return clientStatus;
     }
 
-    public Task<IEnumerable<ClientStatus>> GetAllAsync()
+    public Task<IEnumerable<IClientStatus>> GetAllAsync()
     {
-        return Task.FromResult<IEnumerable<ClientStatus>>(context.ClientStatuses);
+        return Task.FromResult<IEnumerable<IClientStatus>>(context.ClientStatuses);
     }
 
-    public async Task AddAsync(ClientStatus entity)
+    public async Task AddAsync(IClientStatus entity)
     {
-        await context.ClientStatuses.AddAsync(entity);
+        if (entity is ClientStatus clientStatusEntity)
+        {
+            await context.ClientStatuses.AddAsync(clientStatusEntity);
+        }
+        else
+        {
+            throw new InvalidOperationException("The provided entity is not of type ClientStatus.");
+        }
     }
 
-    public async Task UpdateAsync(int id, ClientStatus entity)
+    public async Task UpdateAsync(int id, IClientStatus entity)
     {
         var clientStatus = await context.ClientStatuses.FindAsync(id);
         if (clientStatus is null)
